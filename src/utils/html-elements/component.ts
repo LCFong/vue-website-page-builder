@@ -1,5 +1,6 @@
 interface ComponentData {
   title: string
+  script?: string
   html_code: string
   cover_image: string | null
   category: string
@@ -37,6 +38,64 @@ const component: Components[] = [
   {
     components: {
       data: [
+        {
+          title: 'Carousel',
+          html_code: `<section class="carousel-section">\n<div class="md:pbx-pt-16 md:pbx-pb-16 pbx-pt-6 pbx-pb-6 lg:pbx-px-4 pbx-px-2"><div class="pbx-mx-auto pbx-max-w-7xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="flex-1 py-2">
+                <div class="carousel-container relative">
+                    <div class="absolute h-full w-full carousel-cover z-10">
+                      <script > 
+                          const carousels = document.querySelectorAll('.pbx-carousel-container');
+                           window.intervalIds =  window?.intervalIds??[];
+
+                          carousels.forEach(carousel => {
+                              let currentIndex = 0;
+                              const slides = carousel.querySelector('.pbx-carousel-inner');
+                              const cover = carousel.querySelector('.pbx-carousel-cover');
+                              const totalSlides = carousel.querySelectorAll('.pbx-slide').length;
+                              function showSlide(index) {
+                                slides.style.transform = 'translateX(' + (-index * 100) + '%)';
+                              }
+                              function nextSlide() {
+                                currentIndex = (currentIndex + 1) % totalSlides;
+                                showSlide(currentIndex);
+                              }
+                              function prevSlide() {
+                                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                                showSlide(currentIndex);
+                              }
+                              carousel.querySelector('.pbx-next').addEventListener('click', nextSlide);
+                              carousel.querySelector('.pbx-prev').addEventListener('click', prevSlide);
+                              
+                              function startAutoSlide() {
+                                for(let id of window.intervalIds){
+                                  // reset interval
+                                  clearInterval(id);
+                                }
+                                window.intervalIds = []
+                                window.intervalIds.push( setInterval(nextSlide, 3000) )
+                              }
+                              startAutoSlide();
+                          });
+                      </script>
+
+                    </div>
+                    <div class="carousel carousel-inner">
+                    </div>
+                    <span class="carousel-button left prev" >❮</span>
+                    <span class="carousel-button right next" >❯</span>
+                </div>
+          </div></div></div></div>\n</section>`,
+          category: 'Images',
+          cover_image: `
+                      <svg fill="#384152" version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                        viewBox="0 -2 32 30" xml:space="preserve">
+                      <path d="M29,2H3C1.3,2,0,3.3,0,5v16c0,1.7,1.3,3,3,3h26c1.7,0,3-1.3,3-3V5C32,3.3,30.7,2,29,2z M7.7,14.3c0.4,0.4,0.4,1,0,1.4
+                        C7.5,15.9,7.3,16,7,16s-0.5-0.1-0.7-0.3l-2-2c-0.4-0.4-0.4-1,0-1.4l2-2c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4L6.4,13L7.7,14.3z
+                        M27.7,13.7l-2,2C25.5,15.9,25.3,16,25,16s-0.5-0.1-0.7-0.3c-0.4-0.4-0.4-1,0-1.4l1.3-1.3l-1.3-1.3c-0.4-0.4-0.4-1,0-1.4
+                        s1-0.4,1.4,0l2,2C28.1,12.7,28.1,13.3,27.7,13.7z"/>
+                      </svg>
+        `,
+        },
         {
           title: 'Single Image',
           html_code: `<section>\n<div class="md:pbx-pt-16 md:pbx-pb-16 pbx-pt-6 pbx-pb-6 lg:pbx-px-4 pbx-px-2"><div class="pbx-mx-auto pbx-max-w-7xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="flex-1 py-2"> <img class="object-cover w-full object-top aspect-square " src="${getPlaceholderImageDataUrl()}" alt="provider"></div></div></div></div>\n</section>`,

@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 const unsplashKey = import.meta.env.VITE_UNSPLASH_KEY
 import { usePageBuilderModal } from '../../composables/usePageBuilderModal'
 import { delay } from '../../composables/delay'
 import { preloadImage } from '../../composables/preloadImage'
 import { getPageBuilder } from '../../composables/builderInstance'
 import { useTranslations } from '../../composables/useTranslations'
+
 const { translate } = useTranslations()
 
 const pageBuilderService = getPageBuilder()
@@ -21,6 +22,11 @@ const getApplyImageToSelection = ref('')
 const getCurrentUser = ref('')
 
 const getUnsplashImages = ref([])
+
+// Carousel
+// the flag of selecte multiple media 
+const multipleMedia = inject('multipleMedia')
+const selectedMedia = inject('selectedMedia')
 
 const fetchUnsplash = async function () {
   getIsLoading.value = true
@@ -42,11 +48,12 @@ const fetchUnsplash = async function () {
 
   try {
     const response = await fetch(
-      `https://api.unsplash.com/search/photos?page=${getCurrentPageNumber.value}&per_page=24&query=${getSearchTerm.value || 'kinfolk'}${orientationParam}`,
+      // `https://api.unsplash.com/search/photos?page=${getCurrentPageNumber.value}&per_page=24&query=${getSearchTerm.value || 'kinfolk'}${orientationParam}`,
+      `https://picsum.photos/v2/list`,
       {
         headers: {
           'Accept-Version': 'v1',
-          Authorization: `Client-ID ${unsplashKey}`,
+          // Authorization: `Client-ID ${unsplashKey}`,
         },
       },
     )
@@ -73,7 +80,28 @@ const handleImageClick = async function (data) {
   }
 
   await delay(100)
-  getApplyImageToSelection.value = data.url || ''
+
+  // Multiple Select or Single Select
+  if( !multipleMedia.value  ){
+    getApplyImageToSelection.value = data.url || ''
+  }else{
+    if (!getApplyImageToSelection.value) {
+      getApplyImageToSelection.value = []
+    }
+    
+    // Check if image is already selected; Remove or add.
+    const existingIndex = getApplyImageToSelection.value.findIndex(
+      img => img.src === data.url
+    )
+    
+    if (existingIndex > -1) {
+      // Selected, remove this image.
+      getApplyImageToSelection.value.splice(existingIndex, 1)
+    } else {
+      // Not selected, Add this image
+      getApplyImageToSelection.value.push({ src: data.url, user: data.user })
+    }
+  }
 
   getIsLoadingImage.value = false
 }
@@ -111,17 +139,27 @@ const applySelectedImage = async function (imageURL) {
   isLoading.value = false
 }
 
+const applySelectedImagesToCarousel = async function (images) {
+  isLoading.value = true
+  await pageBuilderService.applySelectedImagesToCarousel(images)
+
+  closeMediaLibraryModal()
+  isLoading.value = false
+}
+
 // on mounted
 onMounted(async () => {
   getSearchTerm.value = localStorage.getItem('unsplash-query') || 'kinfolk'
   getCurrentPageNumber.value = Number(localStorage.getItem('unsplash-page')) || 1
 
   await fetchUnsplash()
+  getApplyImageToSelection.value = selectedMedia.value
+  
 })
 </script>
 
 <template>
-  <div>
+  <div class="">
     <div v-if="getIsLoading || isLoading" class="pbx-min-h-[98vh] pbx-h-[98vh]">
       <div class="pbx-flex pbx-items-center pbx-justify-center">
         <div
@@ -338,11 +376,38 @@ onMounted(async () => {
               </div>
             </template>
             <template v-if="getApplyImageToSelection && !getIsLoadingImage">
-              <img
-                class="pbx-mx-auto pbx-block pbx-w-full pbx-object-cover pbx-object-center pbx-cursor-pointer"
-                :src="`${getApplyImageToSelection}`"
-                alt="file"
-              />
+              
+              <div v-if="!multipleMedia">
+                <img
+                  class="pbx-mx-auto pbx-block pbx-w-full pbx-object-cover pbx-object-center pbx-cursor-pointer"
+                  :src="`${getApplyImageToSelection}`"
+                  alt="file"
+                />
+              </div>
+
+              <!-- multiple image select -->
+              <div v-else>
+                <div class="pbx-grid pbx-grid-cols-2 pbx-gap-2">
+                  <div
+                    v-for="(img, index) in getApplyImageToSelection"
+                    :key="index"
+                    class="pbx-relative"
+                  >
+                    <img
+                      class="pbx-w-full pbx-h-24 pbx-object-cover pbx-rounded"
+                      :src="img.src"
+                      :alt="img.user"
+                    />
+                    <button
+                      @click="removeSelectedImage(index)"
+                      class="pbx-absolute pbx-top-1 pbx-right-1 pbx-bg-red-500 pbx-text-white pbx-rounded-full pbx-w-6 pbx-h-6 pbx-flex pbx-items-center pbx-justify-center pbx-text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div class="md:pbx-px-3 pbx-px-2">
                 <div>
                   <p class="pbx-myPrimaryParagraph pbx-font-normal pbx-text-gray-900 pbx-pt-4">
@@ -363,16 +428,33 @@ onMounted(async () => {
                       <dt class="pbx-text-gray-500">{{ translate('By:') }}</dt>
                       <dd class="pbx-text-gray-900">{{ getCurrentUser }}</dd>
                     </div>
+
+                    <div
+                      v-if="multipleMedia"
+                      class="pbx-py-3 pbx-flex pbx-justify-between pbx-text-sm pbx-font-normal pbx-items-center"
+                    >
+                      <dt class="pbx-text-gray-500">{{ translate('Selected:') }}</dt>
+                      <dd class="pbx-text-gray-900">{{ getApplyImageToSelection?.length }} {{ translate('images') }}</dd>
+                    </div>
                   </dl>
                 </div>
                 <div class="pbx-flex pbx-justify-end pbx-mt-4 pbx-w-full">
                   <button
-                    v-if="getApplyImageToSelection && typeof getApplyImageToSelection === 'string'"
-                    @click="applySelectedImage(getApplyImageToSelection)"
-                    class="pbx-myPrimaryButton"
-                    type="button"
-                  >
-                    {{ translate(' Select image') }}
+                      v-if="!multipleMedia && getApplyImageToSelection && typeof getApplyImageToSelection === 'string'"
+                      @click="applySelectedImage(getApplyImageToSelection)"
+                      class="pbx-myPrimaryButton"
+                      type="button"
+                    >
+                      {{ translate('Select image') }}
+                  </button>
+                    <!-- Multiple Select Button -->
+                  <button
+                      v-if="multipleMedia && getApplyImageToSelection && getApplyImageToSelection.length > 0"
+                      @click="applySelectedImagesToCarousel(getApplyImageToSelection)"
+                      class="pbx-myPrimaryButton"
+                      type="button"
+                    >
+                      {{ translate('Select images') }} ({{ getApplyImageToSelection.length }})
                   </button>
                 </div>
               </div>

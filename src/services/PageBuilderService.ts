@@ -53,6 +53,10 @@ export const AVAILABLE_LANGUAGES: AvailableLanguage[] = [
   'da',
 ]
 
+interface CarouselImage {
+  src: string;
+}
+
 export class PageBuilderService {
   // Class properties with types
   private fontSizeRegex =
@@ -2365,6 +2369,7 @@ export class PageBuilderService {
    * @returns {Promise<void>}
    */
   public async applySelectedImage(image: ImageObject): Promise<void> {
+
     this.pageBuilderStateStore.setApplyImageToSelection(image)
 
     if (!this.getElement.value) return
@@ -2376,6 +2381,21 @@ export class PageBuilderService {
 
       await this.handleAutoSave()
     }
+  }
+
+  public async applySelectedImagesToCarousel(images: CarouselImage[]): Promise<void> {
+
+    this.pageBuilderStateStore.setApplyImageToSelection(images)
+    
+    if (!this.getElement.value) return
+    
+    if (this.getApplyImageToSelection.value && this.getApplyImageToSelection.value.length >= 1) {
+      await nextTick()
+      this.buildCarouselToBuilder(images)
+    }
+
+    await this.handleAutoSave()
+   
   }
 
   /**
@@ -2394,12 +2414,80 @@ export class PageBuilderService {
 
     // If exactly one img and no div, set as base primary image
     if (imgElements.length === 1 && divElements.length === 0) {
+      
+      // Set default applyImageToSelection to Array
+      this.pageBuilderStateStore.setApplyImageToSelection({src:''})
+
       this.pageBuilderStateStore.setBasePrimaryImage(imgElements[0].src)
       return
     }
 
     // Otherwise, clear the base primary image
     this.pageBuilderStateStore.setBasePrimaryImage(null)
+  }
+
+  private setCarouselImagesFromSelectedElement(): void {
+    if (!this.getElement.value) return
+
+    const inner_element = this.getElement.value.parentNode as HTMLDivElement
+    const element = inner_element.getElementsByClassName("pbx-carousel-inner")[0]
+    
+    if (!element) return
+    
+    // Set default applyImageToSelection to Array
+    this.pageBuilderStateStore.setApplyImageToSelection([])
+
+    const imgElements = element.getElementsByClassName("pbx-slide-img")
+
+    const images = ref<{src: string}[]>([])
+    if( imgElements.length >=1 ){
+      for (let ele of imgElements) {
+        const htmlElement = ele as HTMLImageElement; 
+        if( htmlElement.src ){
+          images.value.push( {src: htmlElement.src} )
+        }
+      }
+    }
+    
+    this.buildCarouselToBuilder(images.value)
+  }
+
+  /**
+   * To build the carousel inner with images.
+   * @param images - the images in carousel element
+   */
+  private buildCarouselToBuilder(images: CarouselImage[]){
+    const cover = this.pageBuilderStateStore.getElement as HTMLDivElement
+    
+    if( !cover.className.includes("pbx-carousel-cover")  ){
+      // not in carousel container
+      return 
+    }
+    const inner_element = cover.parentNode as HTMLDivElement
+    const element = inner_element.getElementsByClassName("pbx-carousel-inner")[0]
+    
+    if (element && images.length >= 1) {
+      const carouselRandom = Math.random().toString(36).substring(2, 15);
+      const carouselClass = "pbx-carousel-inner-" + carouselRandom;
+      element.className = `${carouselClass} pbx-carousel pbx-carousel-inner`;
+
+      element.innerHTML = '';
+      images.forEach(item => {
+        if (item.src) {
+          const newSlide = document.createElement('div');
+          newSlide.classList.add('pbx-slide'); 
+          newSlide.style.minWidth = "100%"; 
+
+          const newImage = document.createElement('img') as HTMLImageElement; 
+          newImage.src = item.src; 
+          newImage.classList.add("pbx-slide-img"); 
+          newSlide.appendChild(newImage); 
+
+          element.appendChild(newSlide);
+        }
+      });
+    }
+    this.pageBuilderStateStore.setCarouselImages(images)
   }
 
   /**
@@ -3284,6 +3372,8 @@ export class PageBuilderService {
     // This ensures elements exist in the DOM.
     await nextTick()
     this.setBasePrimaryImageFromSelectedElement()
+    // Carousel
+    this.setCarouselImagesFromSelectedElement()
     this.handleHyperlink(undefined, null, false)
     this.handleOpacity(undefined)
     this.handleBackgroundOpacity(undefined)

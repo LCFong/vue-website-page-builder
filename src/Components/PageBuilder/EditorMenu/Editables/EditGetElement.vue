@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, provide, nextTick} from 'vue'
 import DynamicModalBuilder from '../../../Modals/DynamicModalBuilder.vue'
 import TipTapInput from '../../../TipTap/TipTapInput.vue'
 import MediaLibraryModal from '../../../Modals/MediaLibraryModal.vue'
@@ -19,6 +19,7 @@ const customMediaComponent = inject('CustomMediaComponent')
 const getElement = computed(() => {
   return pageBuilderStateStore.getElement
 })
+
 
 // Get tagName of element
 const elementTag = computed(() => {
@@ -49,6 +50,14 @@ const descriptionModalTipTap = ref('')
 const firstButtonModalTipTap = ref('')
 const secondButtonModalTipTap = ref(null)
 const thirdButtonModalTipTap = ref(null)
+
+// Carousel
+const multipleMedia = ref(false)
+const selectedMedia = ref(false)
+provide('multipleMedia', multipleMedia )
+provide('selectedMedia', selectedMedia )
+// --------
+
 // set dynamic modal handle functions
 const firstModalButtonFunctionDynamicModalBuilderTipTap = ref(null)
 const secondModalButtonFunctionDynamicModalBuilderTipTap = ref(null)
@@ -82,6 +91,11 @@ const getBasePrimaryImage = computed(() => {
   return pageBuilderStateStore.getBasePrimaryImage
 })
 
+// Carousel
+const getCarouselImages = () => {
+  return pageBuilderStateStore.getCarouselImages
+} 
+
 const showMediaLibraryModal = ref(false)
 // modal content
 const titleMedia = ref('')
@@ -106,6 +120,28 @@ const handleAddImage = function () {
     showMediaLibraryModal.value = false
   }
 }
+
+// Carousel
+// ---------------
+const handleSetCarousel = function () {
+  // open modal to true
+  showMediaLibraryModal.value = true
+
+  // select multiple
+  multipleMedia.value = true
+  selectedMedia.value = getCarouselImages()
+
+  titleMedia.value = translate('Media Library')
+  descriptionMedia.value = null
+  firstButtonMedia.value = translate('Close')
+  secondButtonMedia.value = translate('Select Multiple Images')
+
+  // handle click
+  firstMediaButtonFunction.value = function () {
+    showMediaLibraryModal.value = false
+  }
+}
+// Carousel
 
 // Logic for Video Iframe
 
@@ -340,7 +376,7 @@ const handleDelete = function () {
       @firstMediaButtonFunction="firstMediaButtonFunction"
     >
     </MediaLibraryModal>
-
+    
     <div class="pbx-select-none">
       <p v-if="false" class="pbx-font-medium pbx-text-[10px] pbx-w-max lg:pbx-block pbx-hidden">
         Editing
@@ -392,7 +428,26 @@ const handleDelete = function () {
           </div>
           <TextColorEditor></TextColorEditor>
         </template>
-
+        <!-- Carousel -->
+        <template
+          v-if="
+            getElement &&
+            getComponent &&
+            getElement.className.includes(`pbx-carousel`)  &&
+            !pageBuilderService.ElOrFirstChildIsIframe()
+          "
+        >
+          <div class="pbx-flex pbx-items-center pbx-justify-start pbx-gap-2 pbx-w-max">
+            <div
+              @click="handleSetCarousel"
+              class=" pbx-h-10 pbx-w-10 pbx-cursor-pointer pbx-flex pbx-items-center pbx-justify-center hover:pbx-bg-gray-100 pbx-aspect-square pbx-text-myPrimaryDarkGrayColor pbx-bg-gray-100 pbx-rounded-xl hover:pbx-bg-myPrimaryLinkColor hover:pbx-text-white"
+            >
+              <svg fill="currentColor" width="20px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.125 6.17L15.079.535c-.151-.416-.595-.637-.989-.492L.492 5.006c-.394.144-.593.597-.441 1.013l2.156 5.941V8.777c0-1.438 1.148-2.607 2.56-2.607H8.36l4.285-3.008 2.479 3.008h2.001zM19.238 8H4.767a.761.761 0 0 0-.762.777v9.42c.001.444.343.803.762.803h14.471c.42 0 .762-.359.762-.803v-9.42A.761.761 0 0 0 19.238 8zM18 17H6v-2l1.984-4.018 2.768 3.436 2.598-2.662 3.338-1.205L18 14v3z"/></svg>
+            </div>
+          </div>
+        </template>
+        <!-- Carousel -->
+         
         <template
           v-if="
             getElement &&

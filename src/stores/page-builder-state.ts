@@ -51,12 +51,13 @@ interface PageBuilderState {
   component: ComponentObject | null
   components: ComponentObject[]
   basePrimaryImage: string | null
+  carouselImages: Array<Object> | null
   configPageBuilder: PageBuilderConfig | null
   showModalHTMLEditor: boolean
   toggleGlobalHtmlMode: boolean
 
   // Media Library State
-  applyImageToSelection: ImageObject
+  applyImageToSelection: ImageObject | ImageObject[]
   currentPreviewImage: string | null
 
   // User State
@@ -115,6 +116,7 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
     component: null,
     components: [],
     basePrimaryImage: null,
+    carouselImages: [],
     configPageBuilder: null,
     showModalHTMLEditor: false,
     toggleGlobalHtmlMode: false,
@@ -261,6 +263,12 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
       return state.basePrimaryImage
     },
 
+    // ----
+    getCarouselImages(state: PageBuilderState): Array<Object> | null {
+      return state.carouselImages
+    },
+    // -----
+
     getPageBuilderConfig(state: PageBuilderState): PageBuilderConfig | null {
       return state.configPageBuilder
     },
@@ -271,7 +279,7 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
       return state.toggleGlobalHtmlMode
     },
 
-    getApplyImageToSelection(state: PageBuilderState): ImageObject {
+    getApplyImageToSelection(state: PageBuilderState): ImageObject | ImageObject[] {
       return state.applyImageToSelection
     },
 
@@ -452,6 +460,13 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
 
       this.basePrimaryImage = payload
     },
+
+    // Carousel
+    setCarouselImages(payload: Array<{src:string}> | []): void {
+      this.carouselImages = payload
+    },
+    //------
+
     setCurrentLayoutPreview(payload: string): void {
       localStorage.setItem('preview', payload)
     },
@@ -467,7 +482,7 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
       this.toggleGlobalHtmlMode = payload
     },
 
-    setApplyImageToSelection(payload: ImageObject): void {
+    setApplyImageToSelection(payload: ImageObject | ImageObject[]): void {
       this.applyImageToSelection = payload
     },
     setCurrentPreviewImage(payload: string | null): void {

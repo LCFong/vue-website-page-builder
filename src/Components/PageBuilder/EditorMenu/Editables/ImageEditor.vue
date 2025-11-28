@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, inject } from 'vue'
+import { computed, ref, inject, provide } from 'vue'
 import MediaLibraryModal from '../../../Modals/MediaLibraryModal.vue'
 import { sharedPageBuilderStore } from '../../../../stores/shared-store'
 import { preloadImage } from '../../../../composables/preloadImage'
@@ -13,6 +13,7 @@ const pageBuilderStateStore = sharedPageBuilderStore
 const customMediaComponent = inject('CustomMediaComponent')
 
 const getIsLoadingImage = ref(false)
+const getIsLoadingCarousel = ref(false)
 
 const showMediaLibraryModal = ref(false)
 // modal content
@@ -24,12 +25,28 @@ const thirdButtonMedia = ref(null)
 // set dynamic modal handle functions
 const firstMediaButtonFunction = ref(null)
 
+// Carousel
+const multipleMedia = ref(false)
+const selectedMedia = ref(false)
+provide('multipleMedia', multipleMedia )
+provide('selectedMedia', selectedMedia )
+// --------
+
 // get current image from store
 const getBasePrimaryImage = computed(() => {
+  
   if (pageBuilderStateStore.getBasePrimaryImage) {
     loadingImage(pageBuilderStateStore.getBasePrimaryImage)
   }
   return pageBuilderStateStore.getBasePrimaryImage
+})
+
+// Carousel
+const getCarouselImages = computed(() => {
+  if (pageBuilderStateStore.getCarouselImages) {
+    loadingCarousel(pageBuilderStateStore.getCarouselImages)
+  }
+  return pageBuilderStateStore.getCarouselImages
 })
 
 const handleAddImage = function () {
@@ -49,6 +66,26 @@ const handleAddImage = function () {
   // end modal
 }
 
+// Carousel
+const handleSetCarousel = function () {
+  // open modal to true
+  showMediaLibraryModal.value = true
+
+  // select multiple
+  multipleMedia.value = true
+  selectedMedia.value = getCarouselImages.value
+
+  titleMedia.value = translate('Media Library')
+  descriptionMedia.value = null
+  firstButtonMedia.value = translate('Close')
+  secondButtonMedia.value = translate('Select Multiple Images')
+
+  // handle click
+  firstMediaButtonFunction.value = function () {
+    showMediaLibraryModal.value = false
+  }
+}
+
 const loadingImage = async function (imageURL) {
   getIsLoadingImage.value = true
 
@@ -57,6 +94,18 @@ const loadingImage = async function (imageURL) {
     await delay(200)
     getIsLoadingImage.value = false
   }
+}
+const loadingCarousel = async function (images) {
+  getIsLoadingCarousel.value = true
+
+  images.forEach( async(image) => {
+    if (image && typeof image.src === 'string' && image.src.length > 2) {
+      
+      await preloadImage(image.src)
+      await delay(200)
+    }
+  });
+  getIsLoadingCarousel.value = false
 }
 </script>
 <template>
@@ -72,6 +121,14 @@ const loadingImage = async function (imageURL) {
           >
         </div>
       </div>
+    </div>
+    <div v-show="getCarouselImages && !getIsLoadingCarousel">
+      <img v-for="image in getCarouselImages"
+        class="pbx-object-cover pbx-object-center pbx-w-full pbx-cursor-pointer"
+        :src="image.src"
+        @click="handleSetCarousel"
+        alt="image"
+      />
     </div>
     <div v-show="getBasePrimaryImage && !getIsLoadingImage">
       <img

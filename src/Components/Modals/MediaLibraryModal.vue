@@ -3,7 +3,7 @@ import { provide } from 'vue'
 import DefaultMediaLibraryComponent from '../../tests/DefaultComponents/DefaultMediaLibraryComponent.vue'
 import ModalBuilder from './ModalBuilder.vue'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true,
@@ -27,6 +27,7 @@ defineProps({
     type: Object,
     default: null,
   },
+
 })
 
 const emit = defineEmits(['firstMediaButtonFunction'])
@@ -40,6 +41,7 @@ const firstButton = function () {
 const closeMediaLibraryModal = () => {
   firstButton()
 }
+
 provide('closeMediaLibraryModal', closeMediaLibraryModal)
 </script>
 

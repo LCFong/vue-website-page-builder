@@ -14,6 +14,10 @@ const props = defineProps({
     type: String,
     default: 'success',
   },
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
   maxWidth: {
     type: String,
     default: '2xl',

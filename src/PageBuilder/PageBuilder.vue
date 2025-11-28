@@ -502,6 +502,16 @@ onMounted(async () => {
   await delay(10000)
   ensureBuilderInitialized()
 })
+
+// use injected Script from html_code
+const runScript=(scriptTxt)=>{
+  Function(scriptTxt??'')()
+}
+const readScript=(component)=>{
+  if(!component){ return '' }
+  let c = component.getElementsByTagName('script')[0]
+  return c?c.innerHTML:''
+}
 </script>
 
 <template>
@@ -985,12 +995,18 @@ onMounted(async () => {
         <!-- Element Popover toolbar end -->
 
         <div id="pagebuilder" class="pbx-text-black pbx-font-sans">
-          <template v-for="component in getComponents" :key="component.id">
-            <div
+          <template v-for="component,idx in getComponents" :key="component.id">
+            <div 
               v-if="component.html_code"
+              :ref="'component'+idx"
               v-html="component.html_code"
               @mouseup="handleSelectComponent(component)"
-            ></div>
+            >
+          </div>
+         
+            <div v-if="$refs['component'+idx]"> 
+              {{ runScript( readScript( $refs['component'+idx][0] )) }}
+            </div>
           </template>
         </div>
       </main>
