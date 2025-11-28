@@ -2428,6 +2428,7 @@ export class PageBuilderService {
 
   private setCarouselImagesFromSelectedElement(): void {
     if (!this.getElement.value) return
+    this.pageBuilderStateStore.setCarouselImages([])
 
     const inner_element = this.getElement.value.parentNode as HTMLDivElement
     const element = inner_element.getElementsByClassName("pbx-carousel-inner")[0]
