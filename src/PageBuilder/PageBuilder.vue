@@ -42,6 +42,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disableResumeModal: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const { translate, loadTranslations } = useTranslations()
@@ -253,6 +257,9 @@ const secondModalButtonResumeEditingFunction = ref(null)
 const thirdModalButtonResumeEditingFunction = ref(null)
 
 const handlerRumeEditingForUpdate = async function () {
+  if( props.disableResumeModal ){
+    return 
+  }
   typeModal.value = 'warning'
   showModalResumeEditing.value = true
 

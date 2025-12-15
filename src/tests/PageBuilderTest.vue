@@ -64,6 +64,7 @@ watch(currentTranslations, async () => {
     pageSettings: pageSettings,
   } as const
 
+  console.log( newComponents )
   await pageBuilderService.startBuilder(configPageBuilder, newComponents)
 })
 </script>

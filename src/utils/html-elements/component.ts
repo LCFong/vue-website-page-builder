@@ -40,7 +40,7 @@ const component: Components[] = [
       data: [
         {
           title: 'Carousel',
-          html_code: `<section class="carousel-section">\n<div class="md:pbx-pt-16 md:pbx-pb-16 pbx-pt-6 pbx-pb-6 lg:pbx-px-4 pbx-px-2"><div class="pbx-mx-auto pbx-max-w-7xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="flex-1 py-2">
+          html_code: `<section class="carousel-section">\n<div class=""><div class="pbx-mx-auto pbx-max-w-8xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="flex-1 py-2">
                 <div class="carousel-container relative">
                     <div class="absolute h-full w-full carousel-cover z-10">
                       <script > 
