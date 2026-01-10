@@ -58,10 +58,12 @@ const component: Components[] = [
                               function nextSlide() {
                                 currentIndex = (currentIndex + 1) % totalSlides;
                                 showSlide(currentIndex);
+                                startAutoSlide();
                               }
                               function prevSlide() {
                                 currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
                                 showSlide(currentIndex);
+                                startAutoSlide();
                               }
                               carousel.querySelector('.pbx-next').addEventListener('click', nextSlide);
                               carousel.querySelector('.pbx-prev').addEventListener('click', prevSlide);
