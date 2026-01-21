@@ -6,6 +6,7 @@ import DynamicModalBuilder from '../Modals/DynamicModalBuilder.vue'
 import { sharedPageBuilderStore } from '../../stores/shared-store'
 import { getPageBuilder } from '../../composables/builderInstance'
 import { useTranslations } from '../../composables/useTranslations'
+import { CustomButton } from './CustomButton.js'
 import TextAlign from '@tiptap/extension-text-align'
 import TypographyForTipTap from '../PageBuilder/EditorMenu/Editables/TypographyForTipTap.vue'
 
@@ -69,6 +70,8 @@ const editor = useEditor({
     TextAlign.configure({
       types: ['heading', 'paragraph'],
     }),
+    CustomButton,
+
   ],
   editorProps: {
     attributes: {
@@ -181,9 +184,54 @@ const setEnteretURL = function () {
 }
 
 const showTypography = ref(false)
+const showButton = ref(false)
+const buttonConfig = ref({
+  text: 'Click Here',
+  href: 'https://example.com',
+  color: 'blue',
+  size: 'md',
+  font: 'base',
+  weight: 'normal',
+})
+
+const colorOptions= ref([
+  { value: 'blue', label: 'Blue', bgClass: 'pbx-bg-blue-600' },
+  { value: 'green', label: 'Green', bgClass: 'pbx-bg-green-600' },
+  { value: 'red', label: 'Red', bgClass: 'pbx-bg-red-600' },
+  { value: 'gray', label: 'Gray', bgClass: 'pbx-bg-gray-600' },
+  { value: 'outline', label: 'Outline', bgClass: 'pbx-bg-white border pbx-border-blue-600' }
+])
+const sizeOptions= ref([
+  { value: 'sm', label: 'Small' },
+  { value: 'md', label: 'Medium' },
+  { value: 'lg', label: 'Large' }
+])
+const fontOptions =ref([
+  { value: 'sm', label: 'Small' },
+  { value: 'base', label: 'Medium' },
+  { value: 'lg', label: 'Large' }
+])
 
 const toggleShowTypography = function () {
   showTypography.value = !showTypography.value
+}
+const toggleShowButton = function () {
+  showButton.value = !showButton.value
+}
+
+const insertButton = function () {
+  editor.value.chain()
+    .focus()
+    .insertSimpleButton({
+      text: buttonConfig.value.text,
+      href: buttonConfig.value.href,
+      color: buttonConfig.value.color,
+      size: buttonConfig.value.size,
+      font: buttonConfig.value.font,
+      weight: buttonConfig.value.weight
+    })
+    .run()
+  toggleShowButton()
 }
 
 onBeforeMount(() => {
@@ -413,6 +461,105 @@ onMounted(() => {
             </div>
 
             <!-- Toggle showTypography start -->
+
+            <!-- Set Button -->
+            <div
+              @click="toggleShowButton"
+              class="pbx-h-10  pbx-w-10 pbx-cursor-pointer pbx-flex pbx-items-center pbx-justify-center pbx-aspect-square pbx-bg-gray-100 pbx-rounded-xl hover:pbx-bg-myPrimaryLinkColor pbx-text-white"
+              :class="{
+                'pbx-bg-myPrimaryLinkColor pbx-text-white hover:pbx-text-white hover:pbx-bg-myPrimaryLinkColor':
+                  editor.isActive({ textAlign: 'center' }),
+              }"
+            >
+              <svg width="20px" class="" height="20px" viewBox="0 0 15 15" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 10V8.5M5.5 8.5V3.5C5.5 2.94772 5.94772 2.5 6.5 2.5C7.05228 2.5 7.5 2.94772 7.5 3.5V7.5H10.8529C11.7626 7.5 12.5 8.23741 12.5 9.14706V10C12.5 12.4853 10.4853 14.5 8 14.5H7.5C5.29086 14.5 3.5 12.7091 3.5 10.5C3.5 9.39543 4.39543 8.5 5.5 8.5ZM9 5.5H11C12.3807 5.5 13.5 4.38071 13.5 3C13.5 1.61929 12.3807 0.5 11 0.5H4C2.61929 0.5 1.5 1.61929 1.5 3C1.5 4.38071 2.61929 5.5 4 5.5" stroke="#000000"/>
+              </svg>
+            </div>
+            
+            <div class="pbx-relative">
+              <div v-show="showButton" ref="setButtonDropdown" class="pbx-absolute pbx-left-0 pbx-right-0 pbx-z-10 pbx-w-96 pbx-p-4 pbx-rounded-md pbx-shadow-lg pbx-bg-white">
+                <h3 class="pbx-text-lg pbx-font-medium pbx-mb-4">Button Config</h3>
+    
+                <div class="pbx-grid pbx-grid-cols-1 md:pbx-grid-cols-3 pbx-gap-4">
+                  <div>
+                    <label class="block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Text</label>
+                    <input v-model="buttonConfig.text" 
+                      type="text"
+                      class="pbx-w-full pbx-px-3 pbx-py-2 pbx-border pbx-border-gray-300 pbx-rounded-md pbx-shadow-sm ">
+                  </div>
+                  
+                  <div class="pbx-col-span-2">
+                    <label class="block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Link</label>
+                    <input v-model="buttonConfig.href" 
+                      type="text"
+                      placeholder="https://example.com"
+                      class="pbx-w-full pbx-px-3 pbx-py-2 pbx-border pbx-border-gray-300 pbx-rounded-md pbx-shadow-sm ">
+                  </div>
+                    
+                  <div>
+                      <label class="pbx-block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Color</label>
+                      <div class="pbx-flex pbx-space-x-2">
+                      <button v-for="color in colorOptions" 
+                        :key="color.value"
+                        @click="buttonConfig.color = color.value"
+                        :class="['pbx-w-8 pbx-h-8 pbx-rounded-full pbx-border-2', 
+                            color.bgClass,
+                            buttonConfig.color === color.value ? 'pbx-border-gray-800' : 'pbx-border-transparent']"
+                        :title="color.label">
+                      </button>
+                      </div>
+                  </div>
+                  
+                  <div class="pbx-col-span-2">
+                    <label class="pbx-block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Size</label>
+                    <div class="pbx-flex pbx-space-x-2">
+                    <button v-for="size in sizeOptions" 
+                      :key="size.value"
+                      @click="buttonConfig.size = size.value"
+                      :class="['pbx-px-3 pbx-py-1 pbx-rounded pbx-text-sm', 
+                              buttonConfig.size === size.value ? 'pbx-bg-blue-100 pbx-text-blue-700' : 'pbx-bg-gray-100 pbx-text-gray-700']">
+                        {{ size.label }}
+                    </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="pbx-block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Weight</label>
+                    <div class="pbx-flex pbx-flex-col">
+                        
+                      <div>
+                          <input class="" value="bold" type="radio" v-model="buttonConfig.weight"></input>
+                          Bold
+                      </div>
+                      <div>
+                          <input class="" value="normal"  type="radio" v-model="buttonConfig.weight"></input>
+                          Normal
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pbx-col-span-2">
+                    <label class="pbx-block pbx-text-sm pbx-font-medium pbx-text-gray-700 ">Text Size</label>
+                    <div class="pbx-flex pbx-space-x-2">
+                    <button v-for="font in fontOptions" 
+                      :key="font.value"
+                      @click="buttonConfig.font = font.value"
+                      :class="['pbx-px-3 pbx-py-1 pbx-rounded pbx-text-sm', 
+                              buttonConfig.font === font.value ? 'pbx-bg-blue-100 pbx-text-blue-700' : 'pbx-bg-gray-100 pbx-text-gray-700']">
+                      {{ font.label }}
+                    </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="pbx-mt-4">
+                  <button @click="insertButton"
+                      class="pbx-w-full pbx-px-4 pbx-py-3 pbx-bg-blue-600 pbx-text-white pbx-font-medium pbx-rounded-md hover:pbx-bg-blue-700 ">
+                      Insert
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <div
               @click="toggleShowTypography"

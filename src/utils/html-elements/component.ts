@@ -99,6 +99,24 @@ const component: Components[] = [
         `,
         },
         {
+          title: 'Text in Background Image',
+          html_code: `<section>\n<div class="md:pbx-pt-16 md:pbx-pb-16 pbx-pt-6 pbx-pb-6 lg:pbx-px-4 pbx-px-2"><div class="pbx-mx-auto pbx-max-w-7xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="relative flex-1 py-2"> <img class=" object-cover w-full  " src="${getPlaceholderImageDataUrl()}" alt="provider">  <div style="position:absolute; transform: translateY(-50%);" class="pbx-top-1/2 break-words py-2 text-white"><p>Layouts and visual.</p><p>Start customizing by editing this default text directly in the editor.</p></div> </div></div></div></div>\n</section>`,
+          category: 'Images',
+          cover_image: `
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="125.5201 272.4783 227.6296 170.7227" width="227.63px" height="170.723px">
+                        <g transform="matrix(2.0564050674438477, 0, 0, 2.0564050674438477, -299.93572998046875, 191.27296447753906)" style="">
+                          <rect class="bg" width="110.693" height="83.02" style="fill: rgb(56, 65, 82); stroke-width: 1;" x="206.893" y="39.489"/>
+                          <polygon class="fg" points="242.868 89.308 256.705 72.703 270.543 89.308" style="fill: rgb(113, 128, 150); stroke-width: 1;"/>
+                          <polygon class="fg" points="267.776 89.308 274.694 81.005 281.614 89.308" style="fill: rgb(113, 128, 150); stroke-width: 1;"/>
+                          <circle class="fg" cx="274.694" cy="74.995" r="2.303" style="fill: rgb(113, 128, 150); stroke-width: 1;"/>
+                          <text x="225" y="81" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="6" font-weight="bold">
+                            Simple Text
+                          </text>
+                        </g>
+                      </svg>
+        `,
+        },
+        {
           title: 'Single Image',
           html_code: `<section>\n<div class="md:pbx-pt-16 md:pbx-pb-16 pbx-pt-6 pbx-pb-6 lg:pbx-px-4 pbx-px-2"><div class="pbx-mx-auto pbx-max-w-7xl"><div class="myPrimaryGap grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"> <div class="flex-1 py-2"> <img class="object-cover w-full object-top aspect-square " src="${getPlaceholderImageDataUrl()}" alt="provider"></div></div></div></div>\n</section>`,
           category: 'Images',
