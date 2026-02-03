@@ -29,6 +29,7 @@ const multipleMedia = inject('multipleMedia')
 const selectedMedia = inject('selectedMedia')
 
 const fetchUnsplash = async function () {
+
   getIsLoading.value = true
   await delay(300)
   localStorage.setItem('unsplash-query', getSearchTerm.value)
@@ -70,6 +71,7 @@ const fetchUnsplash = async function () {
   } finally {
     getIsLoading.value = false
   }
+
 }
 
 const handleImageClick = async function (data) {

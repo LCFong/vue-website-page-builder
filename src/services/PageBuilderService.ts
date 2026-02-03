@@ -3,6 +3,7 @@ import type {
   BuilderResourceData,
   ComponentObject,
   ImageObject,
+  CarouselImage,
   PageBuilderConfig,
   PageSettings,
   SEOCheck,
@@ -53,10 +54,6 @@ export const AVAILABLE_LANGUAGES: AvailableLanguage[] = [
   'da',
 ]
 
-interface CarouselImage {
-  src: string;
-}
-
 export class PageBuilderService {
   // Class properties with types
   private fontSizeRegex =
@@ -95,6 +92,7 @@ export class PageBuilderService {
     this.getApplyImageToSelection = computed(
       () => this.pageBuilderStateStore.getApplyImageToSelection,
     )
+
     this.getLocalStorageItemName = computed(
       () => this.pageBuilderStateStore.getLocalStorageItemName,
     )
@@ -2378,21 +2376,23 @@ export class PageBuilderService {
     if (this.getApplyImageToSelection.value && this.getApplyImageToSelection.value.src) {
       await nextTick()
       this.pageBuilderStateStore.setBasePrimaryImage(`${this.getApplyImageToSelection.value.src}`)
-
+      this.pageBuilderStateStore.setBasePrimaryImageLink(image.link || '')
+      this.pageBuilderStateStore.setBasePrimaryImageTarget(image.target || '')
+      
       await this.handleAutoSave()
     }
   }
 
   public async applySelectedImagesToCarousel(images: CarouselImage[]): Promise<void> {
 
-    this.pageBuilderStateStore.setApplyImageToSelection(images)
+    // this.pageBuilderStateStore.setApplyImageToSelection(images)
     
     if (!this.getElement.value) return
     
-    if (this.getApplyImageToSelection.value && this.getApplyImageToSelection.value.length >= 1) {
-      await nextTick()
+    // if (this.getApplyImageToSelection.value && this.getApplyImageToSelection.value.length >= 1) {
+      // await nextTick()
       this.buildCarouselToBuilder(images)
-    }
+    // }
 
     await this.handleAutoSave()
    
@@ -2414,11 +2414,11 @@ export class PageBuilderService {
 
     // If exactly one img and no div, set as base primary image
     if (imgElements.length === 1 && divElements.length === 0) {
-      
-      // Set default applyImageToSelection to Array
-      this.pageBuilderStateStore.setApplyImageToSelection({src:''})
 
       this.pageBuilderStateStore.setBasePrimaryImage(imgElements[0].src)
+      this.pageBuilderStateStore.setBasePrimaryImageLink(imgElements[0].getAttribute('data-link') || null)
+      this.pageBuilderStateStore.setBasePrimaryImageTarget(imgElements[0].getAttribute('data-target') || null)
+      
       return
     }
 
@@ -2436,16 +2436,16 @@ export class PageBuilderService {
     if (!element) return
     
     // Set default applyImageToSelection to Array
-    this.pageBuilderStateStore.setApplyImageToSelection([])
+    // this.pageBuilderStateStore.setApplyImageToSelection([])
 
     const imgElements = element.getElementsByClassName("pbx-slide-img")
 
-    const images = ref<{src: string}[]>([])
+    const images = ref<CarouselImage[]>([])
     if( imgElements.length >=1 ){
       for (let ele of imgElements) {
         const htmlElement = ele as HTMLImageElement; 
         if( htmlElement.src ){
-          images.value.push( {src: htmlElement.src} )
+          images.value.push( {src: htmlElement.src, link: htmlElement.dataset.link || '', target: htmlElement.dataset.target || ''} )
         }
       }
     }
@@ -2480,6 +2480,8 @@ export class PageBuilderService {
           newSlide.style.minWidth = "100%"; 
 
           const newImage = document.createElement('img') as HTMLImageElement; 
+          newImage.dataset.link = item.link || ''; 
+          newImage.dataset.target = item.target || ''; 
           newImage.src = item.src; 
           newImage.classList.add("pbx-slide-img"); 
           newSlide.appendChild(newImage); 

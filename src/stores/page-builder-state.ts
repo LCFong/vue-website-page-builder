@@ -122,7 +122,7 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
     toggleGlobalHtmlMode: false,
 
     // Media Library State
-    applyImageToSelection: { src: '' },
+    applyImageToSelection: [],
     currentPreviewImage: null,
 
     // User State
@@ -459,6 +459,17 @@ export const usePageBuilderStateStore = defineStore('pageBuilderState', {
       }
 
       this.basePrimaryImage = payload
+    },
+
+    setBasePrimaryImageLink(payload: string | null): void {
+      if (this.element) {
+        this.element.dataset.link = payload ?? ""
+      }
+    },
+    setBasePrimaryImageTarget(payload: string | null): void {
+      if (this.element) {
+        this.element.dataset.target = payload ?? ""
+      }
     },
 
     // Carousel

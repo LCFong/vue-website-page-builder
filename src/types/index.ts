@@ -29,6 +29,14 @@ export interface ComponentObject {
 
 export interface ImageObject {
   src: string
+  link: string | null 
+  target: string | null
+}
+
+export interface CarouselImage {
+  src: string;
+  link: string;
+  target: string;
 }
 
 // For a single component/block passed by the developer
