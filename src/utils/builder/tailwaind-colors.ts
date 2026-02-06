@@ -9,6 +9,16 @@ const tailwindColors: TailwindColors = {
     'pbx-bg-white',
     'pbx-bg-black',
 
+    'pbx-bg-lions-azure',
+    'pbx-bg-lions-blue',
+    'pbx-bg-lions-primary-blue',
+    'pbx-bg-lions-yellow',
+    'pbx-bg-lions-purple',
+    'pbx-bg-lions-gray',
+    'pbx-bg-lions-primary-gray',
+    'pbx-bg-lions-red-orange',
+    'pbx-bg-lions-green',
+
     'pbx-bg-slate-50',
     'pbx-bg-slate-100',
     'pbx-bg-slate-200',
@@ -255,6 +265,16 @@ const tailwindColors: TailwindColors = {
     'none',
     'pbx-text-white',
     'pbx-text-black',
+    
+    'pbx-text-lions-azure',
+    'pbx-text-lions-blue',
+    'pbx-text-lions-primary-blue',
+    'pbx-text-lions-yellow',
+    'pbx-text-lions-purple',
+    'pbx-text-lions-gray',
+    'pbx-text-lions-primary-gray',
+    'pbx-text-lions-red-orange',
+    'pbx-text-lions-green',
 
     'pbx-text-slate-50',
     'pbx-text-slate-100',

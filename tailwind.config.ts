@@ -14,6 +14,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        
+        'lions': {
+          'blue': '#00338D',
+          'yellow': '#EBB700',
+          'purple': '#7A2582',
+          'azure': '#407CCA',
+          'primary-blue': '#0D2240',
+          'gray': '#B3B2B1',
+          'primary-gray': '#55565A',
+          'red-orange': '#FF5B35',
+          'green': '#00AB68',
+        },
+
         ...defaultTheme.colors,
         // Custom colors
         myPrimaryBrandColor: '#000000',
